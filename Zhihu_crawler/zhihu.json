@@ -1,0 +1,17 @@
+{
+  "headers": {
+    "TODO": "Add the info you may need in HTTP requests, like User-Agent, Cookie ..."
+  },
+  "config": {
+    "interval_between_board": 600,
+    "interval_between_question": 2
+  },
+  "mysql": {
+    "host": "",
+    "user": "",
+    "password": "",
+    "database": "",
+    "charset": "",
+    "port": -1
+  }
+}
