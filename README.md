@@ -86,7 +86,7 @@ Choice 2: 阅读 `Zhihu_crawler/zhihu.py`，完成约 40 行的代码填空 :hap
 
 一种参考实现是：使用 `Selenium `模拟点击登录 WebVPN，然后登录 info，进而访问成绩单页面查询到成绩，计算每学期的绩点。
 
-课上已经演示了使用 `Selenium` 进行 WebVPN 登录，并跳转到校内的指定页面。这部分代码见 `WebVPN/webvpn.py`。 你可能需要设计并实现查询过程中可能用到的函数，并补全查询流程。这部分内容在代码中用 `TODO` 标出。当然也可以完全不理会这些东西，自己进行实现。
+使用 `Selenium` 进行 WebVPN 登录并跳转到校内的指定页面的代码码见 `WebVPN/webvpn.py`。 你需要设计并实现查询过程中可能用到的函数，并补全查询流程。这部分内容在代码中用 `TODO` 标出。当然也可以完全不理会这些东西，自己进行实现。
 
 成绩单的页面的信息编码在了 `HTML` 中。你可能需要使用 `BeautifulSoup` 或 `lxml` 等工具进行解析。
 
@@ -215,18 +215,19 @@ mysql> show tables;
 
 通过 clone / fork 代码仓库 **[sast2022-crawler-SQL-training](https://github.com/Btlmd/sast2022-crawler-SQL-training)** 完成作业
 
-- requests 练习，提交在 `zhihu_crawler` 目录下
+- requests 练习，提交在 `Zhihu_crawler` 目录下
   - 代码
   - README: 简要说明使用方法
-  - 爬到的一些数据，导出至少爬 5 次热榜（如果觉得 10 分钟间隔不合适可以自行调整）的数据表，导出为 `sql` 文件。导出后文件较大的，最好上传到云盘后将连接附在  README 中。
-- Selenium 练习，提交在 `webVPN_crawler` 目录下
+  - 爬到的一些数据，导出至少爬 5 次热榜（如果觉得 10 分钟间隔不合适可以自行调整）的数据表，导出为 `sql` 文件。导出后文件较大的，可以使用 gzip 压缩或者上传云盘附上链接。
+  - 导出方法见课前准备材料。
+- Selenium 练习，提交在 `WebVPN_crawler` 目录下
   - 代码
   - README: 简要说明使用方法
 - SQL 练习，提交在 `SQL_query` 目录下
   - 请在练习数据库中使用 `tee` 指令输出查询日志，然后提交上述 7 条查询产生的查询日志文件
 - 其他你希望包括的内容
 
-完成作业后，将你的代码进行托管，如 Github， Tsinghua Git 等，然后在原仓库中新建 Issue，提交你的代码仓库地址。
+完成作业后，将代码进行托管，如 Github， Tsinghua Git 等，然后在原仓库中新建 Issue，提交代码仓库地址。
 
 可以在 Issue 中附上学号或邮箱，**或** 将 Issue 编号与学号发送至 [liu-md20@mails.tsinghua.edu.cn](mailto:liu-md20@mails.tsinghua.edu.cn) ，便于我们统计大家的参与情况并进行作业奖励的发放。
 
