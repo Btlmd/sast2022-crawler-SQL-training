@@ -13,8 +13,8 @@ class WebVPN:
     def __init__(self, opt: dict, headless=False):
         self.root_handle = None
         self.driver: wd = None
-        self.passwd = opt["passwd"]
-        self.userid = opt["id"]
+        self.passwd = opt["username"]
+        self.userid = opt["password"]
         self.headless = headless
 
     def login_webvpn(self):
@@ -111,7 +111,9 @@ class WebVPN:
         :return:
         """
 
-        # Hint: - Wait until the elements are ready
+        # Hint: - Use `access` method to jump to info.tsinghua.edu.cn
+        #       - Use `switch_another` method to change the window handle
+        #       - Wait until the elements are ready, then preform your actions
         #       - Before return, make sure that you have logged in successfully
         raise NotImplementedError
 
