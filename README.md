@@ -6,6 +6,41 @@
 
 # Updates
 
+- 07-16
+  - 如果在完成作业的过程中遇到了问题或困惑，欢迎在群里提出并直接 @ 我。也欢迎同学们自由交（水）流（群）
+  
+  - 第二题，`WebVPN_crawler/webvpn.py` 中 16, 17 两行代码被写反，感谢 @ 虞皓翔，@ 刘子贤 的指正
+  
+    代码中的 
+    
+    ```python
+        self.passwd = opt["username"]
+        self.userid = opt["password"]
+    ```
+    
+    其实应该是
+    
+    ```python
+        self.passwd = opt["password"]
+        self.userid = opt["username"]
+    ```
+    
+    
+  - 第二题，如果在运行过程中发现找不到元素的情形，可以尝试
+    - 加入 implicit_wait，或 WebDriverWait().unitl 来给页面提供加载时间
+    - 换用其他定位器来定位元素
+    
+  - 第二题，访问校园网的代码中使用组合键删除 `input` 中字符串的代码
+    - 可以使用 `<element>.clear()` 替代，这是正确的实现方法，感谢 @ 虞皓翔 的提醒
+    - 如要使用这个 ActionChain，MacOS 用户需要将 `CTRL` 换为 `COMMAND`，感谢 @ 卢若凡 的提醒
+    
+  - 第三题，导入数据库后若无法正常现实中文字符，可以使用
+   
+    ```mysql
+    SET NAMES utf8mb4; 
+    ```   
+    调整 Client 与 Connection 的字符集为 `utf8mb4`
+    
 - 07-15
 
   - 关于知乎热榜爬虫
@@ -180,6 +215,9 @@ mysql> show tables;
 | record       |
 +--------------+
 2 rows in set (0.00 sec)
+
+mysql> set names utf8mb4;
+Query OK, 0 rows affected (0.00 sec)
 ```
 
 这样就成功导入了表。
