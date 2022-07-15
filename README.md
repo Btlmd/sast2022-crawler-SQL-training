@@ -27,7 +27,7 @@
     ```bash
     git checkout --orphan submission # 创建一个没有前驱的 submission 分支
     git add .                        # 添加当前的全部文件
-    git rm --cached  WebVPN_crawler/settings.json  Zhihu_crawler/zhihu.json # 删除含有个人信息的问题
+    git rm --cached  WebVPN_crawler/settings.json  Zhihu_crawler/zhihu.json # 删除含有个人信息的文件
     ```
 
     - 这时使用 `git status` 确认待 Commit 的文件中不含上述两个文件，且包含 `.gitignore`
