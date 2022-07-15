@@ -4,6 +4,46 @@
 >
 > 2022 年 7 月 13 日
 
+# Updates
+
+- 07-15
+
+  - 对于非典型的问题，如 知乎盐选 等网址不形如 `zhihu.com/question/*` 的问题**可以无需爬取、直接跳过**。
+
+  - **Commit 时务必检查仓库历史中没有 存在学号，密码，Cookie 等个人信息 的文件**
+  
+    由于练习的设计失误，没有给仓库添加 `.gitignore` ，这造成在提交作业时极大的安全隐患，**这点我需要向大家致歉**。
+    给出一种提交方法
+
+    - 添加 `.gitignore` 文件，将 `settings.json` 等含有个人信息的文件 ignore。
+
+    ```
+    Zhihu_crawler/zhihu.json
+    WebVPN_crawler/settings.json
+    ```
+
+    - 由于先前的 Commit 中可能包含了上述个人信息，可以创建一个独立的分支，删除敏感文件
+
+    ```bash
+    git checkout --orphan submission # 创建一个没有前驱的 submission 分支
+    git add .                        # 添加当前的全部文件
+    git rm --cached  WebVPN_crawler/settings.json  Zhihu_crawler/zhihu.json # 删除含有个人信息的问题
+    ```
+
+    - 这时使用 `git status` 确认待 Commit 的文件中不含上述两个文件，且包含 `.gitignore`
+    - 提交，然后仅推送新分支 
+
+    ```bash
+    git commit -m "info-purged submission"
+    git push origin submission
+    ```
+
+    此时仓库中的 `submission` 分支含有新代码；而旧分支保存原状。
+
+    如果 **已经推送** 了含有个人信息的旧分支，可以将代码托管平台上含有个人信息的旧分支删除，然后尽快修改泄露的密码等信息。（应该没有已经推送了密码的吧呜呜呜
+
+    此外，也可以参考 [Github 文档](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository) ，使用  `bfg`  等工具移除敏感信息，然后对仓库进行 force push。这样无需新建分支且可以保留提交记录。
+
 # requests 练习
 
 本次爬虫练习中，希望你动手实现一个知乎热榜定时跟踪器。使得他可以定期爬取知乎热榜，并记录热榜中问题的一些基本信息，如问题摘要、描述、热度、访问人数、回答数量等等，然后将这些数据存入数据库进行保存。
@@ -21,25 +61,29 @@ Choice 2: 阅读 `Zhihu_crawler/zhihu.py`，完成约 40 行的代码填空 :hap
 ### 推荐实现顺序
 
 1. 在 `Zhihu_crawler/zhihu.json` 中填入
-    - 你认为可能会用到的 Headers
-    - MySQL 服务器的配置信息
 
-    此时运行结果为
-    ```bash
-    2022-07-09 18:19:54.295 [INFO] Settings loaded
-    2022-07-09 18:19:54.419 [INFO] Begin crawling ...
-    2022-07-09 18:19:54.539 [ERROR] Crawl 161 encountered an exception . This crawl stopped.
-    Traceback (most recent call last):
-      File "zhihu.py", line 96, in watch
-        board_entries = self.get_board()
-      File "zhihu.py", line 259, in get_board
-        raise NotImplementedError
-    NotImplementedError
-    2022-07-09 18:19:54.543 [INFO] Sleep 599.8760051727295 second(s)
-    ```
-    提示你应该实现 `get_board`。
+   - 你认为可能会用到的 Headers
+   - MySQL 服务器的配置信息
+
+   此时运行结果为
+
+   ```bash
+   2022-07-09 18:19:54.295 [INFO] Settings loaded
+   2022-07-09 18:19:54.419 [INFO] Begin crawling ...
+   2022-07-09 18:19:54.539 [ERROR] Crawl 161 encountered an exception . This crawl stopped.
+   Traceback (most recent call last):
+     File "zhihu.py", line 96, in watch
+       board_entries = self.get_board()
+     File "zhihu.py", line 259, in get_board
+       raise NotImplementedError
+   NotImplementedError
+   2022-07-09 18:19:54.543 [INFO] Sleep 599.8760051727295 second(s)
+   ```
+
+   提示你应该实现 `get_board`。
 
 2. 在 `Zhihu_crawler/zhihu.py` 中按照提示实现 `get_board` 方法。再运行 `zhihu.py` 此时运行结果类似
+
    ```bash
    2022-07-09 18:20:38.343 [INFO] Settings loaded
     2022-07-09 18:20:38.496 [INFO] Begin crawling ...
@@ -54,11 +98,13 @@ Choice 2: 阅读 `Zhihu_crawler/zhihu.py`，完成约 40 行的代码填空 :hap
     NotImplementedError
     2022-07-09 18:20:41.677 [INFO] Sleep 2 second(s)
    ```
+
    此时爬虫已经可以正常获取热榜（`watch` 方法中，会将热榜中每个问题截取 20 个字符进行显示），但还无法获取问题页面中的信息。
 
    在代码中有一些实现提示。
 
 3. 在 `Zhihu_crawler/zhihu.py` 中按照提示实现 `get_question` 方法。再运行 `zhihu.py` 此时运行结果类似
+
    ```bash
    2022-07-09 18:26:15.442 [INFO] Settings loaded
    2022-07-09 18:26:15.737 [INFO] Begin crawling ...
@@ -137,23 +183,31 @@ mysql> show tables;
 
 
 ## Q1 添加新列
+
 >  给 `record` 表添加一列 `heat_w`，准备以万为单位为储存 INT 型的热度。
+
 - 提示：
   - ALTER TABLE
   - 使用 `DESC record;` 查看表中的所有列。
   - 使用 `SHOW COLUMNS FROM record LIKE 'heat%';` 查看表中以 `heat` 开头的列。
+
 ## Q2 快速填充
 
 > 给 `heat_w` 一列以**万**为单位填入热度。
 >
 > 如 ` 114514万热度` 时填入 `114514`
+
 - 提示：
+
   - UPDATE
   - REPLACE
+
 - 可以使用
+
   ```mysql
   SELECT COUNT(*) cnt FROM record WHERE heat_w is null and heat is not null;
   ```
+
   检查还有多少列没有填好（即原来非空但 heat_w 为空）
 
 ## Q3 查询关键词
@@ -183,6 +237,7 @@ mysql> show tables;
 ## Q5 上榜统计
 
 > 查询每个 `title` 上榜的次数，只返回上榜 100 次以上的 `title` 和 `上榜次数`。由多到少降序排列。
+
 - 提示 
   - SELECT
   - COUNT
@@ -194,12 +249,14 @@ mysql> show tables;
 ## Q6 最热记录
 
 > 查询浏览次数最多的问题，获取它浏览次数最多的那一次记录中的 `title`, `visitCount`, `hit_at`, `heat`, `ranking` 。
+
 - 提示
   - SELECT
   - WHERE + Sub Query
   - MAX
 
 ## Q7 查阅合订本
+
 > 查询哪些问题的**标题至少变化了一次**。对于这些问题，查询其 `qid` 和 `title` ，每个不同的标题仅返回 1 次。每个问题的不同标题连续显示，按 `qid` 升序排列。
 
 - 提示：
