@@ -8,11 +8,17 @@
 
 - 07-15
 
-  - 对于非典型的问题，如 知乎盐选 等网址不形如 `zhihu.com/question/*` 的问题**可以无需爬取、直接跳过**。
+  - 关于知乎热榜爬虫
+    - 对于非典型的问题，如 知乎盐选，`theatre` 等网址不形如 `zhihu.com/question/*` 的热榜内容 **可以无需爬取、直接跳过**。
+    - 对于热榜信息的爬取，可以自选 `/hot` `/billboard` 等来源
+    - 爬虫的各个部分可以根据自己的想法进行实现，没有固定的实现标准。
 
-  - **Commit 时务必检查仓库历史中没有 存在学号，密码，Cookie 等个人信息 的文件**
+  - 关于 WebVPN 爬虫 
+    
+    **Commit 时务必检查仓库历史中没有 存在学号，密码，Cookie 等个人信息 的文件**
   
-    由于练习的设计失误，没有给仓库添加 `.gitignore` ，这造成在提交作业时极大的安全隐患，**这点我需要向大家致歉**。
+    由于练习的设计失误，没有给仓库添加 `.gitignore` ，这造成在提交作业时的安全隐患，**这点我需要向大家致歉**。
+    
     给出一种提交方法
 
     - 添加 `.gitignore` 文件，将 `settings.json` 等含有个人信息的文件 ignore。
@@ -22,7 +28,7 @@
     WebVPN_crawler/settings.json
     ```
 
-    - 由于先前的 Commit 中可能包含了上述个人信息，可以创建一个独立的分支，删除敏感文件
+    - 由于先前的 Commit 中可能包含了上述个人信息，可以创建一个独立的分支，例如 `submission`，删除敏感文件
 
     ```bash
     git checkout --orphan submission # 创建一个没有前驱的 submission 分支
@@ -31,7 +37,7 @@
     ```
 
     - 这时使用 `git status` 确认待 Commit 的文件中不含上述两个文件，且包含 `.gitignore`
-    - 提交，然后仅推送新分支 
+    - 提交，然后仅推送新分支
 
     ```bash
     git commit -m "info-purged submission"
@@ -41,6 +47,8 @@
     此时仓库中的 `submission` 分支含有新代码；而旧分支保存原状。
 
     如果 **已经推送** 了含有个人信息的旧分支，可以将代码托管平台上含有个人信息的旧分支删除，然后尽快修改泄露的密码等信息。（应该没有已经推送了密码的吧呜呜呜
+    
+    - 推送后，可以将 `submission` 置为默认分支。
 
     此外，也可以参考 [Github 文档](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository) ，使用  `bfg`  等工具移除敏感信息，然后对仓库进行 force push。这样无需新建分支且可以保留提交记录。
 
