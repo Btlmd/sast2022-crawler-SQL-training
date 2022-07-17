@@ -5,6 +5,39 @@
 > 2022 年 7 月 13 日
 
 # Updates
+- 07-17 
+  - 在服务器终端无法输入中文的问题。
+  
+    可以用 `locale` 命令查看当前的语言情况，可能看到语言都是 POSIX
+    - 先安装 locale 工具
+      ```bash
+      sudo apt-get clean && sudo apt-get update && sudo apt-get install -y locales
+      ```
+    - 生成并应用 `locale` 
+      ```bash
+      sudo locale-gen zh_CN.UTF-8
+      sudo update-locale LANG=zh_CN.utf8
+      ```
+    - 退出终端重新登录，此时再用 `locale` 命令查看，就已经设置为中文 UTF-8 了
+      ```bash  
+      LANG=zh_CN.utf8
+      LANGUAGE=
+      LC_CTYPE="zh_CN.utf8"
+      LC_NUMERIC="zh_CN.utf8"
+      LC_TIME="zh_CN.utf8"
+      LC_COLLATE="zh_CN.utf8"
+      LC_MONETARY="zh_CN.utf8"
+      LC_MESSAGES="zh_CN.utf8"
+      LC_PAPER="zh_CN.utf8"
+      LC_NAME="zh_CN.utf8"
+      LC_ADDRESS="zh_CN.utf8"
+      LC_TELEPHONE="zh_CN.utf8"
+      LC_MEASUREMENT="zh_CN.utf8"
+      LC_IDENTIFICATION="zh_CN.utf8"
+      LC_ALL=
+      ```
+      [[Referene]](https://www.thomas-krenn.com/en/wiki/Configure_Locales_in_Ubuntu)
+
 - 07-16 No.2
   - **远程登录 MySQL 时应该使用自己容器中 3306 端口对应的主机映射端口**
   - zhihu.json 的填写说明
