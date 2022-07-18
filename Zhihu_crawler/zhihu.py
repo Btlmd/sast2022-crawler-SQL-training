@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import json
 import pymysql
 from bs4 import BeautifulSoup as BS
@@ -13,7 +13,7 @@ formatter = logging.Formatter(fmt, datefmt)
 logger = logging.getLogger()
 logger.setLevel(level)
 
-file = logging.FileHandler("../zhihu.log", encoding='utf-8')
+file = logging.FileHandler("zhihu.log", encoding='utf-8')
 file.setLevel(level)
 file.setFormatter(formatter)
 logger.addHandler(file)
@@ -26,9 +26,13 @@ logger.addHandler(console)
 
 class ZhihuCrawler:
     def __init__(self):
-        with open("zhihu.json", "r", encoding="utf8") as f:
-            self.settings = json.load(f)  # Load settings
+        with open("Zhihu_crawler/zhihu.json", "r", encoding="utf8") as f:
+            self.settings = json.load(f)
         logger.info("Settings loaded")
+        self.headers = {
+            "User-Agent": self.settings["web"]["user-agent"],
+            "Cookie": self.settings["web"]["cookie"]
+        }
 
 
     def sleep(self, sleep_key, delta=0):
@@ -66,7 +70,7 @@ class ZhihuCrawler:
                     conn.commit()
                     if op is not None:
                         return op(cur)
-                except:  # Log query then exit
+                except:
                     if hasattr(cur, "_last_executed"):
                         logger.error("Exception @ " + cur._last_executed)
                     else:
@@ -75,9 +79,9 @@ class ZhihuCrawler:
 
     def watch(self, top=None):
         """
-        The crawling flow
+        The crawling logic
 
-        :param top: only look at the first `top` entries in the board. It can be used when debugging
+        :param top: only look at the first `top` entries in the board
         :return:
         """
         self.create_table()
@@ -120,7 +124,7 @@ class ZhihuCrawler:
                             if len(e.args) > 0 and isinstance(e.args[0], requests.Response):
                                 logger.exception(f"{e}; {e.args[0].status_code}; {e.args[0].text}")
                             else:
-                                logger.exception(f"{str(e)}")
+                                logger.exception(e)
                         else:
                             logger.info(f"Get question detail for {item['title']}: raw detail length {len(detail['raw']) if detail['raw'] else 0}")
                     try:
@@ -132,13 +136,13 @@ class ZhihuCrawler:
                 logger.exception(f"Crawl {crawl_id} encountered an exception {e}. This crawl stopped.")
             self.sleep("interval_between_board", delta=(begin_time - time.time()))
 
-    def create_table(self):
+    def create_table(self, prefix: str = ''):
         """
-        Create tables to store the hot question records and crawl records
+        Create Table to Store the hot question records and crawl records
 
         """
         sql = f"""
-CREATE TABLE IF NOT EXISTS `crawl` (
+CREATE TABLE IF NOT EXISTS `{prefix}crawl` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `begin` DOUBLE NOT NULL,
     `end` DOUBLE,
@@ -148,7 +152,7 @@ AUTO_INCREMENT = 1
 CHARACTER SET = utf8mb4 
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `record`  (
+CREATE TABLE IF NOT EXISTS `{prefix}record`  (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `qid` INT NOT NULL,
     `crawl_id` BIGINT NOT NULL,
@@ -233,7 +237,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         TODO: Fetch current hot questions
 
-        :return: hot question list, ranking from high to low
+        :return: hot question list
 
         Return Example:
         [
@@ -262,15 +266,35 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         ]
         """
 
-        # Hint: - Parse HTML, pay attention to the <section> tag.
-        #       - Use keyword argument `class_` to specify the class of a tag in `find`
-        #       - Hot Question List can be accessed in https://www.zhihu.com/hot
+        # Hint: Parse HTML, pay attention to the <section> tag.
+        #       use keyword argument `class_` to specify the class of a tag
+        resp = requests.get("https://www.zhihu.com/hot", headers=self.headers)
+        resp.raise_for_status()
+        soup = BS(resp.text, features='lxml')
+        items = soup.find_all('section')
+        hot = []
 
-        raise NotImplementedError
+        for item in items:
+            url = item.find('a')['href']
+            try:
+                qid = int(item.find('a')['href'].split("/")[-1])
+            except:
+                qid = None
+            entry = {
+                "title": item.find('h2').text.strip(),
+                "heat": item.find(class_='HotItem-metrics').text.split('\u200b')[0].replace(' ', ""),
+                "excerpt": item.find('p', class_="HotItem-excerpt").text
+                    if item.find('p', class_="HotItem-excerpt")
+                    else None,
+                "url": url,
+                "qid": qid
+            }
+            hot += [entry]
+        return hot
 
     def get_question(self, qid: int) -> dict:
         """
-        TODO: Fetch question info by question ID
+        TODO: Fetch question info by Question ID
 
         :param qid: Question ID
         :return: a dict of question info
@@ -292,20 +316,35 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 在奈良发表演讲时中枪
                 。据悉，安倍晋三在上
                 救护车时还有意。。。",
-            "hit_at": 1657264954.3134503  # 请求的时间戳
+            "hit_at": 1657264954.3134503  # 请求时间
         }
 
 
         """
 
-        # Hint: - Parse JSON, which is embedded in a <script> and contains all information you need.
-        #       - After find the element in soup, use `.text` attribute to get the inner text
-        #       - Use `json.loads` to convert JSON string to `dict` or `list`
-        #       - You may first save the JSON in a file, format it and locate the info you need
-        #       - Use `time.time()` to create the time stamp
-        #       - Question can be accessed in https://www.zhihu.com/question/<Question ID>
+        # Hint: Parse JSON, which is embedded in a <script> and contains all information you need.
+        #       after find the element in soup, use .text attribute to get the inner text
+        #       use `json.loads` to convert JSON string to dict
+        #       you may first save the JSON in a file, format it and find the info you need
+        #       use `time.time()` to create the time stamp
+        #       don't forget to include a header in your request
 
-        raise NotImplementedError
+        resp = requests.get(
+            "https://www.zhihu.com/question/%s" % str(qid),
+            headers=self.headers
+        )
+        resp.raise_for_status()
+        soup = BS(resp.text, features='lxml')
+        init = soup.find('script', id="js-initialData").text
+        dic = json.loads(init)["initialState"]["entities"]["questions"][str(qid)]
+        return {
+            "created": dic["created"],
+            "visitCount": dic['visitCount'],
+            "followerCount": dic['followerCount'],
+            "answerCount": dic['answerCount'],
+            "raw": dic["detail"] if "detail" in dic else '',
+            "hit_at": time.time()
+        }
 
 if __name__ == "__main__":
     z = ZhihuCrawler()
